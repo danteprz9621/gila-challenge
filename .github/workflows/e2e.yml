@@ -1,0 +1,19 @@
+name: E2E
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+# dev and prod have no dependency on each other, so they run in parallel
+# and a failure in one environment never blocks the other.
+jobs:
+  dev:
+    uses: ./.github/workflows/run-e2e.yml
+    with:
+      environment: dev
+
+  prod:
+    uses: ./.github/workflows/run-e2e.yml
+    with:
+      environment: prod

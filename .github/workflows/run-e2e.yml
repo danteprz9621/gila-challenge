@@ -1,0 +1,71 @@
+name: Run E2E suite
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        description: API environment under test (dev or prod)
+        required: true
+        type: string
+
+jobs:
+  e2e:
+    name: E2E tests (${{ inputs.environment }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    services:
+      api:
+        image: ghcr.io/danielsilva-loanpro/sdet-interview-challenge:latest
+        ports:
+          - 3000:3000
+
+    env:
+      API_URL: http://localhost:3000
+      TARGET_ENV: ${{ inputs.environment }}
+      REPORT_DIR: reports/${{ inputs.environment }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Wait for API to be ready
+        run: |
+          for attempt in $(seq 1 30); do
+            curl --silent --fail "$API_URL/$TARGET_ENV/users" > /dev/null && exit 0
+            echo "API not ready yet (attempt $attempt)"; sleep 2
+          done
+          echo "API did not start in time"; exit 1
+
+      - name: Run tests against ${{ inputs.environment }}
+        run: |
+          pytest \
+            --junitxml="$REPORT_DIR/junit.xml" \
+            --html="$REPORT_DIR/report.html" --self-contained-html
+
+      - name: Publish summary
+        if: always()
+        run: |
+          python - <<'EOF' >> "$GITHUB_STEP_SUMMARY"
+          import os, xml.etree.ElementTree as ET
+          suite = ET.parse(f"{os.environ['REPORT_DIR']}/junit.xml").getroot().find("testsuite")
+          total, failed, errors = (int(suite.get(k)) for k in ("tests", "failures", "errors"))
+          print(f"### {os.environ['TARGET_ENV']}: {total - failed - errors}/{total} passed")
+          for case in suite.iter("testcase"):
+              if case.find("failure") is not None or case.find("error") is not None:
+                  print(f"- :x: `{case.get('classname')}::{case.get('name')}`")
+          EOF
+
+      - name: Upload test report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-report-${{ inputs.environment }}
+          path: ${{ env.REPORT_DIR }}
