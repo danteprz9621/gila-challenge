@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="9" skipped="0" tests="32" time="1.044" timestamp="2026-10-01T21:01:52.985963+00:00" hostname="runnervm8df0l"><testcase classname="tests.test_create_user" name="test_create_user_returns_201_and_persists_it" time="0.366" /><testcase classname="tests.test_create_user" name="test_create_user_accepts_age_boundaries[age-minimum]" time="0.015" /><testcase classname="tests.test_create_user" name="test_create_user_accepts_age_boundaries[age-maximum]" time="0.035" /><testcase classname="tests.test_create_user" name="test_create_user_rejects_invalid_payload[missing-name]" time="0.007" /><testcase classname="tests.test_create_user" name="test_create_user_rejects_invalid_payload[name-not-string]" time="0.016"><failure message="AssertionError: Expected 400, got 201: {&#10;    &quot;age&quot;: 30,&#10;    &quot;email&quot;: &quot;qa.18f56450ed@example.com&quot;,&#10;    &quot;name&quot;: 123&#10;  }&#10;  &#10;assert 201 == 400&#10; +  where 201 = &lt;APIResponse url='http://localhost:3000/dev/users' status=201 status_text='CREATED'&gt;.status">users_api = &lt;tests.api.users_client.UsersClient object at 0x7f3712f1b1d0&gt;
+cleanup = ['qa.18f56450ed@example.com'], invalid = {'name': 123}
+
+    @pytest.mark.parametrize("invalid", INVALID_FIELDS)
+    def test_create_user_rejects_invalid_payload(users_api, cleanup, invalid):
+        payload = build_user(**invalid)
+    
+        response = users_api.create(payload)
+        if response.ok:
+            cleanup.append(payload["email"])
+    
+&gt;       assert response.status == 400, f"Expected 400, got {response.status}: {response.text()}"
+E       AssertionError: Expected 400, got 201: {
+E           "age": 30,
+E           "email": "qa.18f56450ed@example.com",
+E           "name": 123
+E         }
+E         
+E       assert 201 == 400
+E        +  where 201 = &lt;APIResponse url='http://localhost:3000/dev/users' status=201 status_text='CREATED'&gt;.status
+
+tests/test_create_user.py:39: AssertionError</failure></testcase><testcase classname="tests.test_create_user" name="test_create_user_rejects_invalid_payload[missing-email]" time="0.007" /><testcase classname="tests.test_create_user" name="test_create_user_rejects_invalid_payload[missing-age]" time="0.007" /><testcase classname="tests.test_create_user" name="test_create_user_rejects_invalid_payload[age-not-integer]" time="0.006" /><testcase classname="tests.test_create_user" name="test_create_user_rejects_invalid_payload[age-below-minimum]" time="0.006" /><testcase classname="tests.test_create_user" name="test_create_user_rejects_invalid_payload[age-above-maximum]" time="0.006" /><testcase classname="tests.test_create_user" name="test_create_user_rejects_invalid_payload[email-bad-format]" time="0.012"><failure message="AssertionError: Expected 400, got 201: {&#10;    &quot;age&quot;: 30,&#10;    &quot;email&quot;: &quot;not-an-email&quot;,&#10;    &quot;name&quot;: &quot;Jane Doe&quot;&#10;  }&#10;  &#10;assert 201 == 400&#10; +  where 201 = &lt;APIResponse url='http://localhost:3000/dev/users' status=201 status_text='CREATED'&gt;.status">users_api = &lt;tests.api.users_client.UsersClient object at 0x7f3712f1b1d0&gt;
+cleanup = ['not-an-email'], invalid = {'email': 'not-an-email'}
+
+    @pytest.mark.parametrize("invalid", INVALID_FIELDS)
+    def test_create_user_rejects_invalid_payload(users_api, cleanup, invalid):
+        payload = build_user(**invalid)
+    
+        response = users_api.create(payload)
+        if response.ok:
+            cleanup.append(payload["email"])
+    
+&gt;       assert response.status == 400, f"Expected 400, got {response.status}: {response.text()}"
+E       AssertionError: Expected 400, got 201: {
+E           "age": 30,
+E           "email": "not-an-email",
+E           "name": "Jane Doe"
+E         }
+E         
+E       assert 201 == 400
+E        +  where 201 = &lt;APIResponse url='http://localhost:3000/dev/users' status=201 status_text='CREATED'&gt;.status
+
+tests/test_create_user.py:39: AssertionError</failure></testcase><testcase classname="tests.test_create_user" name="test_create_user_with_non_object_body_returns_400" time="0.006"><failure message="AssertionError: Expected 400, got 500: {&#10;    &quot;error&quot;: &quot;Internal server error&quot;&#10;  }&#10;  &#10;assert 500 == 400&#10; +  where 500 = &lt;APIResponse url='http://localhost:3000/dev/users' status=500 status_text='INTERNAL SERVER ERROR'&gt;.status">users_api = &lt;tests.api.users_client.UsersClient object at 0x7f3712f1b1d0&gt;
+
+    def test_create_user_with_non_object_body_returns_400(users_api):
+        response = users_api.create([])
+    
+&gt;       assert response.status == 400, f"Expected 400, got {response.status}: {response.text()}"
+E       AssertionError: Expected 400, got 500: {
+E           "error": "Internal server error"
+E         }
+E         
+E       assert 500 == 400
+E        +  where 500 = &lt;APIResponse url='http://localhost:3000/dev/users' status=500 status_text='INTERNAL SERVER ERROR'&gt;.status
+
+tests/test_create_user.py:46: AssertionError</failure></testcase><testcase classname="tests.test_create_user" name="test_create_user_with_existing_email_returns_409" time="0.017"><failure message="AssertionError: Expected 409, got 500: {&#10;    &quot;error&quot;: &quot;Internal server error&quot;&#10;  }&#10;  &#10;assert 500 == 409&#10; +  where 500 = &lt;APIResponse url='http://localhost:3000/dev/users' status=500 status_text='INTERNAL SERVER ERROR'&gt;.status">users_api = &lt;tests.api.users_client.UsersClient object at 0x7f3712f1b1d0&gt;
+existing_user = {'age': 30, 'email': 'qa.f715167250@example.com', 'name': 'Jane Doe'}
+
+    def test_create_user_with_existing_email_returns_409(users_api, existing_user):
+        duplicate = build_user(email=existing_user["email"], name="Someone Else")
+    
+        response = users_api.create(duplicate)
+    
+&gt;       assert response.status == 409, f"Expected 409, got {response.status}: {response.text()}"
+E       AssertionError: Expected 409, got 500: {
+E           "error": "Internal server error"
+E         }
+E         
+E       assert 500 == 409
+E        +  where 500 = &lt;APIResponse url='http://localhost:3000/dev/users' status=500 status_text='INTERNAL SERVER ERROR'&gt;.status
+
+tests/test_create_user.py:55: AssertionError</failure></testcase><testcase classname="tests.test_delete_user" name="test_delete_user_returns_204_and_removes_it" time="0.021" /><testcase classname="tests.test_delete_user" name="test_delete_user_without_valid_token_returns_401[missing-token]" time="0.016"><failure message="AssertionError: Expected 401, got 204: &#10;assert 204 == 401&#10; +  where 204 = &lt;APIResponse url='http://localhost:3000/dev/users/qa.32ab3bca31@example.com' status=204 status_text='NO CONTENT'&gt;.status">users_api = &lt;tests.api.users_client.UsersClient object at 0x7f3712f1b1d0&gt;
+existing_user = {'age': 30, 'email': 'qa.32ab3bca31@example.com', 'name': 'Jane Doe'}
+token = None
+
+    @pytest.mark.parametrize("token", [None, "wrong-token"], ids=["missing-token", "invalid-token"])
+    def test_delete_user_without_valid_token_returns_401(users_api, existing_user, token):
+        response = users_api.delete(existing_user["email"], token=token)
+    
+&gt;       assert response.status == 401, f"Expected 401, got {response.status}: {response.text()}"
+E       AssertionError: Expected 401, got 204: 
+E       assert 204 == 401
+E        +  where 204 = &lt;APIResponse url='http://localhost:3000/dev/users/qa.32ab3bca31@example.com' status=204 status_text='NO CONTENT'&gt;.status
+
+tests/test_delete_user.py:19: AssertionError</failure></testcase><testcase classname="tests.test_delete_user" name="test_delete_user_without_valid_token_returns_401[invalid-token]" time="0.016"><failure message="AssertionError: Expected 401, got 204: &#10;assert 204 == 401&#10; +  where 204 = &lt;APIResponse url='http://localhost:3000/dev/users/qa.4fb9109116@example.com' status=204 status_text='NO CONTENT'&gt;.status">users_api = &lt;tests.api.users_client.UsersClient object at 0x7f3712f1b1d0&gt;
+existing_user = {'age': 30, 'email': 'qa.4fb9109116@example.com', 'name': 'Jane Doe'}
+token = 'wrong-token'
+
+    @pytest.mark.parametrize("token", [None, "wrong-token"], ids=["missing-token", "invalid-token"])
+    def test_delete_user_without_valid_token_returns_401(users_api, existing_user, token):
+        response = users_api.delete(existing_user["email"], token=token)
+    
+&gt;       assert response.status == 401, f"Expected 401, got {response.status}: {response.text()}"
+E       AssertionError: Expected 401, got 204: 
+E       assert 204 == 401
+E        +  where 204 = &lt;APIResponse url='http://localhost:3000/dev/users/qa.4fb9109116@example.com' status=204 status_text='NO CONTENT'&gt;.status
+
+tests/test_delete_user.py:19: AssertionError</failure></testcase><testcase classname="tests.test_delete_user" name="test_delete_unknown_user_returns_404" time="0.007" /><testcase classname="tests.test_environment_isolation" name="test_user_created_in_one_environment_is_not_visible_in_the_other" time="0.024" /><testcase classname="tests.test_get_user" name="test_get_user_returns_200_with_user" time="0.021" /><testcase classname="tests.test_get_user" name="test_get_unknown_user_returns_404" time="0.006"><failure message="AssertionError: Expected 404, got 500: {&#10;    &quot;error&quot;: &quot;Internal server error&quot;&#10;  }&#10;  &#10;assert 500 == 404&#10; +  where 500 = &lt;APIResponse url='http://localhost:3000/dev/users/qa.e72b3f4a1a@example.com' status=500 status_text='INTERNAL SERVER ERROR'&gt;.status">users_api = &lt;tests.api.users_client.UsersClient object at 0x7f3712f1b1d0&gt;
+
+    def test_get_unknown_user_returns_404(users_api):
+        response = users_api.get(build_user()["email"])
+    
+&gt;       assert response.status == 404, f"Expected 404, got {response.status}: {response.text()}"
+E       AssertionError: Expected 404, got 500: {
+E           "error": "Internal server error"
+E         }
+E         
+E       assert 500 == 404
+E        +  where 500 = &lt;APIResponse url='http://localhost:3000/dev/users/qa.e72b3f4a1a@example.com' status=500 status_text='INTERNAL SERVER ERROR'&gt;.status
+
+tests/test_get_user.py:16: AssertionError</failure></testcase><testcase classname="tests.test_list_users" name="test_list_users_returns_array_containing_created_user" time="0.019" /><testcase classname="tests.test_update_user" name="test_update_user_returns_200_and_persists_changes" time="0.026"><failure message="AssertionError: assert {'age': 30, '...': 'Jane Doe'} == {'age': 31, '...Jane Updated'}&#10;  &#10;  Omitting 1 identical items, use -vv to show&#10;  Differing items:&#10;  {'name': 'Jane Doe'} != {'name': 'Jane Updated'}&#10;  {'age': 30} != {'age': 31}&#10;  &#10;  Full diff:&#10;    {&#10;  -     'age': 31,&#10;  ?             ^&#10;  +     'age': 30,&#10;  ?             ^&#10;        'email': 'qa.d440bc48a7@example.com',&#10;  -     'name': 'Jane Updated',&#10;  ?                   ^^^^^ -&#10;  +     'name': 'Jane Doe',&#10;  ?                   ^^&#10;    }">users_api = &lt;tests.api.users_client.UsersClient object at 0x7f3712f1b1d0&gt;
+existing_user = {'age': 30, 'email': 'qa.d440bc48a7@example.com', 'name': 'Jane Doe'}
+
+    def test_update_user_returns_200_and_persists_changes(users_api, existing_user):
+        changes = build_user(email=existing_user["email"], name="Jane Updated", age=31)
+    
+        response = users_api.update(existing_user["email"], changes)
+    
+        assert response.status == 200
+        assert_user(response)
+        assert response.json() == changes
+&gt;       assert users_api.get(existing_user["email"]).json() == changes
+E       AssertionError: assert {'age': 30, '...': 'Jane Doe'} == {'age': 31, '...Jane Updated'}
+E         
+E         Omitting 1 identical items, use -vv to show
+E         Differing items:
+E         {'name': 'Jane Doe'} != {'name': 'Jane Updated'}
+E         {'age': 30} != {'age': 31}
+E         
+E         Full diff:
+E           {
+E         -     'age': 31,
+E         ?             ^
+E         +     'age': 30,
+E         ?             ^
+E               'email': 'qa.d440bc48a7@example.com',
+E         -     'name': 'Jane Updated',
+E         ?                   ^^^^^ -
+E         +     'name': 'Jane Doe',
+E         ?                   ^^
+E           }
+
+tests/test_update_user.py:15: AssertionError</failure></testcase><testcase classname="tests.test_update_user" name="test_update_user_rejects_invalid_payload[missing-name]" time="0.016" /><testcase classname="tests.test_update_user" name="test_update_user_rejects_invalid_payload[name-not-string]" time="0.016"><failure message="AssertionError: Expected 400, got 200: {&#10;    &quot;age&quot;: 30,&#10;    &quot;email&quot;: &quot;qa.d0790cec48@example.com&quot;,&#10;    &quot;name&quot;: 123&#10;  }&#10;  &#10;assert 200 == 400&#10; +  where 200 = &lt;APIResponse url='http://localhost:3000/dev/users/qa.d0790cec48@example.com' status=200 status_text='OK'&gt;.status">users_api = &lt;tests.api.users_client.UsersClient object at 0x7f3712f1b1d0&gt;
+existing_user = {'age': 30, 'email': 'qa.d0790cec48@example.com', 'name': 'Jane Doe'}
+invalid = {'name': 123}
+
+    @pytest.mark.parametrize("invalid", INVALID_FIELDS)
+    def test_update_user_rejects_invalid_payload(users_api, existing_user, invalid):
+        payload = build_user(**{"email": existing_user["email"], **invalid})
+    
+        response = users_api.update(existing_user["email"], payload)
+    
+&gt;       assert response.status == 400, f"Expected 400, got {response.status}: {response.text()}"
+E       AssertionError: Expected 400, got 200: {
+E           "age": 30,
+E           "email": "qa.d0790cec48@example.com",
+E           "name": 123
+E         }
+E         
+E       assert 200 == 400
+E        +  where 200 = &lt;APIResponse url='http://localhost:3000/dev/users/qa.d0790cec48@example.com' status=200 status_text='OK'&gt;.status
+
+tests/test_update_user.py:24: AssertionError</failure></testcase><testcase classname="tests.test_update_user" name="test_update_user_rejects_invalid_payload[missing-email]" time="0.017" /><testcase classname="tests.test_update_user" name="test_update_user_rejects_invalid_payload[missing-age]" time="0.019" /><testcase classname="tests.test_update_user" name="test_update_user_rejects_invalid_payload[age-not-integer]" time="0.017" /><testcase classname="tests.test_update_user" name="test_update_user_rejects_invalid_payload[age-below-minimum]" time="0.016" /><testcase classname="tests.test_update_user" name="test_update_user_rejects_invalid_payload[age-above-maximum]" time="0.017" /><testcase classname="tests.test_update_user" name="test_update_user_rejects_invalid_payload[email-bad-format]" time="0.016" /><testcase classname="tests.test_update_user" name="test_update_unknown_user_returns_404" time="0.007" /><testcase classname="tests.test_update_user" name="test_update_user_to_existing_email_returns_409" time="0.034" /></testsuite></testsuites>
